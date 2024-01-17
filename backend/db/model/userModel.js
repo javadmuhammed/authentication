@@ -23,14 +23,14 @@ let userModel = new mongoose.Schema({
         required: true
     },
     status: {
-        type: Date,
+        type: Boolean,
         required: true
     },
     access_token: {
-        type: Date,
+        type: String,
         required: true
     }
 })
 
-let userCollection = mongoose.model("user", userModel);
-module.exports = userCollection
+let UserCollection = mongoose.model("user", userModel);
+module.exports = UserCollection
