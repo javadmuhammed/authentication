@@ -24,7 +24,7 @@ function loginActionHelper(username, password) {
                     try {
                         let newPassword = await bcrypt.compare(password, user.password);
                         if (newPassword) {
-                            let newJsonToken = jwt.sign({ email: user.email }, process.env.JWT_KEY, { algorithm: "HS256" })
+                            let newJsonToken = jwt.sign({ email: user.email }, process.env.JWT_KEY, { algorithm: "HS256", expiresIn: process.env.JWT_EXPIRE_IN })
                             user.access_token = newJsonToken;
                             user.save().then(() => {
                                 resolve({ status: true, error: false, msg: "Loggin success", access_token: newJsonToken, refresh_token: user._id })
@@ -79,7 +79,7 @@ function signupActionHelper(name, email, phone, password, status) {
             let joining_date = new Date();
 
 
-            let loginValidator = new InputValidator({ name, email,phone,password }, {
+            let loginValidator = new InputValidator({ name, email, phone, password }, {
                 name: 'required|string',
                 email: 'required|email',
                 phone: 'required|integer|maxLength:10|minLength:10',
@@ -102,7 +102,7 @@ function signupActionHelper(name, email, phone, password, status) {
                     let salt = await bcrypt.genSalt(Number(process.env.BCRYPT_SALT))
                     let newPassword = await bcrypt.hash(password, salt);
                     if (newPassword) {
-                        let access_token = await jwt.sign({ email: email }, process.env.JWT_KEY, { algorithm: "HS256" })
+                        let access_token = await jwt.sign({ email: email }, process.env.JWT_KEY, { algorithm: "HS256", expiresIn: process.env.JWT_EXPIRE_IN })
                         if (access_token) {
                             new UserCollection({
                                 access_token: access_token,
@@ -126,19 +126,37 @@ function signupActionHelper(name, email, phone, password, status) {
                 } else {
                     reject({ status: false, error: true, msg: "Email/Phone number already exist" })
                 }
-            }else{
+            } else {
                 reject({ status: false, error: true, msg: loginValidator.errors })
             }
-        } catch (e) { 
+        } catch (e) {
             reject({ status: false, error: true, msg: "Something went wrong" })
         }
     })
 }
 
+async function jwtValidationHelper(jwt_token) {
+    return new Promise((resolve, reject) => {
 
+        jwt.verify(jwt_token, process.env.JWT_KEY, (err, decode) => {
+            if (err) {
+                reject({ status: false, error: true, msg: "Invalid token" })
+            } else {
+                reject({ status: true, error: false, msg: "Valid token" })
+            }
+        })
+    })
+}
+
+async function reGenerateToken(user_id){
+    return new Promise((resolve,reject)=>{
+        
+    })
+}
 
 
 module.exports = {
     loginActionHelper,
-    signupActionHelper
+    signupActionHelper,
+    jwtValidationHelper
 }
