@@ -1,7 +1,11 @@
 import React from 'react';
 import './Login.css';
+import { useNavigate } from 'react-router';
 
 const Login = () => {
+
+  const navigate = useNavigate();
+
   return (
     <div className="center-container">
     <div className="card">
@@ -51,9 +55,9 @@ const Login = () => {
             <button className="button1">
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Login&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             </button>
-            <button className="button2">Sign Up</button>
+            {/* <button onClick={()=>navigate('/signUp')} className="button2">Sign Up</button> */}
           </div>
-          <button className="button3">Forgot Password</button>
+          <button onClick={()=>navigate('/signUp')} className="button3">Sign Up</button>
         </form>
       </div>
     </div>
